@@ -84,8 +84,7 @@ namespace WorkingFileWatcherConsole
 
             while (true)
             {
-                Thread.Yield();
-                Thread.Sleep(100);
+
             }
         }
     }

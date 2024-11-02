@@ -3,6 +3,11 @@ using WorkingFileWatcher;
 
 namespace WorkingFileWatcherTests
 {
+    /// <summary>
+    /// Sometimes it's best to move 'Start()' as close to the
+    /// first delay, or when you expect the Tasks to begin for the
+    /// tests to actually have enough time to setup everything.
+    /// </summary>
     [TestClass]
     public class FileWatcherTests
     {
@@ -22,7 +27,6 @@ namespace WorkingFileWatcherTests
             this.mockFileWatcherFileReader = new Mock<IFileWatcherFileReader>();
             this.fileWatcher = new FileWatcher(this.mockFileWatcherFileReader.Object);
 
-            this.fileWatcher.Start();
             this.directoriesToDelete = new List<string>();
         }
 
@@ -38,7 +42,7 @@ namespace WorkingFileWatcherTests
 
 
         [TestMethod]
-        public void AddFileToWatch_MovesAFileToAnotherDirectory_WhenItIsEditedTest()
+        public async Task AddFileToWatch_MovesAFileToAnotherDirectory_WhenItIsEditedTest()
         {
             // Arrange
             string sourceTempPath = GetFreshTempDirectory();
@@ -49,14 +53,15 @@ namespace WorkingFileWatcherTests
             string intialText = "Start text";
             string expectedText = "End text";
             System.IO.File.AppendAllText(Path.Combine(sourceTempPath, testFile), intialText);
-
+            
             this.fileWatcher.AddFileToWatch(Path.Combine(sourceTempPath, testFile), destinationTempPath);
             Assert.IsFalse(File.Exists(Path.Combine(destinationTempPath, testFile)));
 
             // Act
-            Thread.Sleep(OverOneSecondInMilliseconds);
+            this.fileWatcher.Start();
+            await Task.Delay(OverOneSecondInMilliseconds);
             System.IO.File.WriteAllText(Path.Combine(sourceTempPath, testFile), expectedText);
-            Thread.Sleep(OverOneSecondInMilliseconds);
+            await Task.Delay(OverOneSecondInMilliseconds);
 
             // Assert
             Assert.IsTrue(File.Exists(Path.Combine(destinationTempPath, testFile)));
@@ -64,9 +69,12 @@ namespace WorkingFileWatcherTests
         }
 
         [TestMethod]
-        public void AddFileToWatch_MovesAFileUponASecondEdit_WhenItIsEditedTwiceTest()
+        public async Task AddFileToWatch_MovesAFileUponASecondEdit_WhenItIsEditedTwiceTest()
         {
             // Arrange
+            this.fileWatcher.Start();
+            await Task.Delay(OverOneSecondInMilliseconds);
+
             string sourceTempPath = GetFreshTempDirectory();
             string destinationTempPath = GetFreshTempDirectory();
             this.directoriesToDelete.AddRange(new string[] { sourceTempPath, destinationTempPath });
@@ -80,14 +88,14 @@ namespace WorkingFileWatcherTests
             this.fileWatcher.AddFileToWatch(Path.Combine(sourceTempPath, testFile), destinationTempPath);
             Assert.IsFalse(File.Exists(Path.Combine(destinationTempPath, testFile)));
 
-            Thread.Sleep(OverOneSecondInMilliseconds);
+            await Task.Delay(OverOneSecondInMilliseconds);
             System.IO.File.WriteAllText(Path.Combine(sourceTempPath, testFile), secondText);
             Assert.IsTrue(File.Exists(Path.Combine(destinationTempPath, testFile)));
 
             // Act
-            Thread.Sleep(OverOneSecondInMilliseconds);
+            await Task.Delay(OverOneSecondInMilliseconds);
             System.IO.File.WriteAllText(Path.Combine(sourceTempPath, testFile), expectedText);
-            Thread.Sleep(OverOneSecondInMilliseconds);
+            await Task.Delay(OverOneSecondInMilliseconds);
 
             // Assert
             Assert.IsTrue(File.Exists(Path.Combine(destinationTempPath, testFile)));
@@ -130,9 +138,11 @@ namespace WorkingFileWatcherTests
         }
 
         [TestMethod]
-        public void AddFileToWatch_DoesNotCopy_WhenFileExistsButOnlyAfterAFailedAddAttemptTest()
+        public async Task AddFileToWatch_DoesNotCopy_WhenFileExistsButOnlyAfterAFailedAddAttemptTest()
         {
             // Arrange
+            this.fileWatcher.Start();
+
             string sourceTempPath = GetFreshTempDirectory();
             string destinationTempPath = GetFreshTempDirectory();
             this.directoriesToDelete.AddRange(new string[] { sourceTempPath, destinationTempPath });
@@ -144,16 +154,16 @@ namespace WorkingFileWatcherTests
             string intialText = "Start text";
 
             // Act
-            Thread.Sleep(OverOneSecondInMilliseconds);
+            await Task.Delay(OverOneSecondInMilliseconds);
             System.IO.File.WriteAllText(Path.Combine(sourceTempPath, testFile), intialText);
-            Thread.Sleep(OverOneSecondInMilliseconds);
+            await Task.Delay(OverOneSecondInMilliseconds);
 
             // Assert
             Assert.IsFalse(File.Exists(Path.Combine(destinationTempPath, testFile)));
         }
 
         [TestMethod]
-        public void AddFileToWatch_CreatesDirectory_WhenDirectoryIsNotFoundTest()
+        public async Task AddFileToWatch_CreatesDirectory_WhenDirectoryIsNotFoundTest()
         {
             // Arrange
             string sourceTempPath = GetFreshTempDirectory();
@@ -168,9 +178,10 @@ namespace WorkingFileWatcherTests
             this.fileWatcher.AddFileToWatch(Path.Combine(sourceTempPath, testFile), destinationTempPath);
 
             // Act
-            Thread.Sleep(OverOneSecondInMilliseconds);
+            this.fileWatcher.Start();
+            await Task.Delay(OverOneSecondInMilliseconds);
             System.IO.File.WriteAllText(Path.Combine(sourceTempPath, testFile), expectedText);
-            Thread.Sleep(OverOneSecondInMilliseconds);
+            await Task.Delay(OverOneSecondInMilliseconds);
 
             // Assert
             Assert.IsTrue(Directory.Exists(destinationTempPath));
@@ -193,9 +204,10 @@ namespace WorkingFileWatcherTests
         #region AddFilesAndDirectoryFromFile
 
         [TestMethod]
-        public void AddFilesAndDirectoryFromFile_WatchesFile_WhenFileIsReadTest()
+        public async Task AddFilesAndDirectoryFromFile_WatchesFile_WhenFileIsReadTest()
         {
             // Arrange
+
             string sourceTempPath = GetFreshTempDirectory();
             string destinationTempPath = GetFreshTempDirectory();
             this.directoriesToDelete.AddRange(new string[] { sourceTempPath, destinationTempPath });
@@ -219,11 +231,12 @@ namespace WorkingFileWatcherTests
 
             this.fileWatcher.AddFilesAndDirectoryFromFile(givenFilePath);
             Assert.IsFalse(File.Exists(Path.Combine(destinationTempPath, testFile)));
+            this.fileWatcher.Start();
 
             // Act
-            Thread.Sleep(OverOneSecondInMilliseconds);
+            await Task.Delay(OverOneSecondInMilliseconds);
             System.IO.File.WriteAllText(Path.Combine(sourceTempPath, testFile), expectedText);
-            Thread.Sleep(OverOneSecondInMilliseconds);
+            await Task.Delay(OverOneSecondInMilliseconds);
 
             // Assert
             Assert.IsTrue(File.Exists(Path.Combine(destinationTempPath, testFile)));
