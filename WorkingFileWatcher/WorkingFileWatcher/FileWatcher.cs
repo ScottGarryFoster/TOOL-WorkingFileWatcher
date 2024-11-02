@@ -111,7 +111,7 @@ namespace WorkingFileWatcher
                         // This is not tested yet
                         else if(lastModified > file.LastUpdated)
                         {
-
+                            CopyFile(file);
                         }
                     }
                     Task.Delay(1000);
@@ -125,8 +125,11 @@ namespace WorkingFileWatcher
         /// <param name="watchedFileInfo">Stores all known information about the file being watched. </param>
         private void CopyFile(WatchedFileInfo watchedFileInfo)
         {
-            File.Copy(watchedFileInfo.FileName, Path.Combine(watchedFileInfo.Destination, Path.GetFileName(watchedFileInfo.FileName)));
+            string from = watchedFileInfo.FileName;
+            string to = Path.Combine(watchedFileInfo.Destination, Path.GetFileName(watchedFileInfo.FileName));
+            File.Copy(from, to, true);
             watchedFileInfo.LastUpdated = File.GetLastWriteTime(watchedFileInfo.FileName);
+            watchedFileInfo.EverUpdated = true;
         }
     }
 }
