@@ -17,8 +17,15 @@ namespace WorkingFileWatcher
         /// </summary>
         private List<WatchedFileInfo> filesToWatch;
 
-        public FileWatcher()
+        /// <summary>
+        /// Reads File Watcher File.
+        /// </summary>
+        private readonly IFileWatcherFileReader fileWatcherFileReader;
+
+        public FileWatcher(IFileWatcherFileReader fileWatcherFileReader)
         {
+            this.fileWatcherFileReader = fileWatcherFileReader ?? 
+                throw new ArgumentNullException(nameof(fileWatcherFileReader));
             this.filesToWatch = new List<WatchedFileInfo>();
         }
 
@@ -43,6 +50,24 @@ namespace WorkingFileWatcher
             this.filesToWatch.Add(watchedFileInfo);
 
             return true;
+        }
+
+        /// <summary>
+        /// Add files or directories using a filewatcher file.
+        /// </summary>
+        /// <param name="path">File path to a filewatcher file. </param>
+        /// <returns>True means added. </returns>
+        public bool AddFilesAndDirectoryFromFile(string path)
+        {
+            bool extracted = this.fileWatcherFileReader
+                .ExtractFilesAndDirectoriesFromFile(
+                    path, out List<WatchedFileInfo> files);
+            if(extracted)
+            {
+                this.filesToWatch.AddRange(files);
+            }
+
+            return extracted;
         }
 
         /// <summary>

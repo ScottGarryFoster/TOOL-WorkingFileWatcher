@@ -1,3 +1,4 @@
+using Moq;
 using WorkingFileWatcher;
 
 namespace WorkingFileWatcherTests
@@ -13,11 +14,14 @@ namespace WorkingFileWatcherTests
 
         private IFileWatcher fileWatcher;
         private List<string> directoriesToDelete;
+        private Mock<IFileWatcherFileReader> mockFileWatcherFileReader;
 
         [TestInitialize]
         public void Setup()
         {
-            this.fileWatcher = new FileWatcher();
+            this.mockFileWatcherFileReader = new Mock<IFileWatcherFileReader>();
+            this.fileWatcher = new FileWatcher(this.mockFileWatcherFileReader.Object);
+
             this.fileWatcher.Start();
             this.directoriesToDelete = new List<string>();
         }
@@ -185,5 +189,81 @@ namespace WorkingFileWatcherTests
             Directory.CreateDirectory(potentialPath);
             return potentialPath;
         }
+
+        #region AddFilesAndDirectoryFromFile
+
+        [TestMethod]
+        public void AddFilesAndDirectoryFromFile_WatchesFile_WhenFileIsReadTest()
+        {
+            // Arrange
+            string sourceTempPath = GetFreshTempDirectory();
+            string destinationTempPath = GetFreshTempDirectory();
+            this.directoriesToDelete.AddRange(new string[] { sourceTempPath, destinationTempPath });
+
+            string testFile = "test.txt";
+            string intialText = "Start text";
+            string expectedText = "End text";
+            System.IO.File.AppendAllText(Path.Combine(sourceTempPath, testFile), intialText);
+
+            string givenFilePath = "givenPath";
+            List<WatchedFileInfo> expected = new()
+            {
+                new WatchedFileInfo {
+                    FileName = Path.Combine(sourceTempPath, testFile),
+                    Destination = destinationTempPath
+                }
+            };
+            this.mockFileWatcherFileReader
+                .Setup(p => p.ExtractFilesAndDirectoriesFromFile
+                    (givenFilePath, out expected)).Returns(true);
+
+            this.fileWatcher.AddFilesAndDirectoryFromFile(givenFilePath);
+            Assert.IsFalse(File.Exists(Path.Combine(destinationTempPath, testFile)));
+
+            // Act
+            Thread.Sleep(OverOneSecondInMilliseconds);
+            System.IO.File.WriteAllText(Path.Combine(sourceTempPath, testFile), expectedText);
+            Thread.Sleep(OverOneSecondInMilliseconds);
+
+            // Assert
+            Assert.IsTrue(File.Exists(Path.Combine(destinationTempPath, testFile)));
+            Assert.AreEqual(expectedText, File.ReadAllText(testFile));
+        }
+
+        [TestMethod]
+        public void AddFilesAndDirectoryFromFile_ReturnsTrue_WhenFileIsReadTest()
+        {
+            // Arrange
+            string givenFilePath = "givenPath";
+            List<WatchedFileInfo> expected = new();
+            this.mockFileWatcherFileReader
+                .Setup(p => p.ExtractFilesAndDirectoriesFromFile
+                    (givenFilePath, out expected)).Returns(true);
+
+            // Act
+            bool actual = this.fileWatcher.AddFilesAndDirectoryFromFile(givenFilePath);
+
+            // Assert
+            Assert.IsTrue(actual);
+        }
+
+        [TestMethod]
+        public void AddFilesAndDirectoryFromFile_ReturnsFalse_WhenFileIsNotReadTest()
+        {
+            // Arrange
+            string givenFilePath = "givenPath";
+            List<WatchedFileInfo> expected = new();
+            this.mockFileWatcherFileReader
+                .Setup(p => p.ExtractFilesAndDirectoriesFromFile
+                    (givenFilePath, out expected)).Returns(false);
+
+            // Act
+            bool actual = this.fileWatcher.AddFilesAndDirectoryFromFile(givenFilePath);
+
+            // Assert
+            Assert.IsFalse(actual);
+        }
+
+        #endregion
     }
 }

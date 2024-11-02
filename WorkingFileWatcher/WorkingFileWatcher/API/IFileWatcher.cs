@@ -21,6 +21,13 @@ namespace WorkingFileWatcher
         bool AddFileToWatch(string path, string directory);
 
         /// <summary>
+        /// Add files or directories using a filewatcher file.
+        /// </summary>
+        /// <param name="path">File path to a filewatcher file. </param>
+        /// <returns>True means added. </returns>
+        bool AddFilesAndDirectoryFromFile(string path);
+
+        /// <summary>
         /// Run the File Watcher.
         /// </summary>
         void Start();
