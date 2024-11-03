@@ -37,7 +37,7 @@ To load a path from file at the moment you need to use the command 'from file' t
 ```
 * Files contains all the files to watch. Add as many as you need.
 * Filepath and Destination are direct paths.
-* As of right now, the Destination requires a back slash at the end.
+* As of right now, the Destination requires a back slash at the end. (#1)
 
 ### Directly
 Upon entering this the next thing to enter is the file then the directory. All directories must end in a back slash.
