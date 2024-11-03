@@ -37,10 +37,9 @@ To load a path from file at the moment you need to use the command 'from file' t
 ```
 * Files contains all the files to watch. Add as many as you need.
 * Filepath and Destination are direct paths.
-* [[#1](https://github.com/ScottGarryFoster/TOOL-WorkingFileWatcher/issues/1)] As of right now, the Destination requires a back slash at the end.
 
 ### Directly
-Upon entering this the next thing to enter is the file then the directory. [[#1](https://github.com/ScottGarryFoster/TOOL-WorkingFileWatcher/issues/1)] All directories must end in a back slash.
+Upon entering this the next thing to enter is the file then the directory.
 
 ### Start
 Start will start the watcher.
