@@ -108,7 +108,7 @@ namespace WorkingFileWatcher
                         {
                             CopyFile(file);
                         }
-                        // This is not tested yet
+                        // This is not tested yet (in unit tests)
                         else if(lastModified > file.LastUpdated)
                         {
                             CopyFile(file);
