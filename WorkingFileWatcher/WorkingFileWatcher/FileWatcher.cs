@@ -114,6 +114,7 @@ namespace WorkingFileWatcher
                             CopyFile(file);
                         }
                     }
+                    Task.Delay(1000).Wait();
                     Task.Yield();
                 }
             });
