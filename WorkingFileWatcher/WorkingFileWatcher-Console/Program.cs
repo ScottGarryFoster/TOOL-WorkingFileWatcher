@@ -13,10 +13,17 @@ namespace WorkingFileWatcherConsole
             IFileWatcher watcher = new FileWatcher(new FileWatcherFileReader(new FileWatcherStringReader()));
             while (true)
             {
+                Console.WriteLine(" ");
+                Console.WriteLine("Commands:");
+                Console.WriteLine("directly - enter file and destination directly to console. ");
+                Console.WriteLine("from file - enter a file to read files and directories from. ");
+                Console.WriteLine("start - Start the watcher. ");
+
                 string entry = Console.ReadLine();
                 entry = entry.Trim().ToLower();
                 if(entry == "from file")
                 {
+                    Console.WriteLine("Enter file to read from: ");
                     entry = Console.ReadLine();
                     entry = entry.Trim();
                     if(string.IsNullOrWhiteSpace(entry))
