@@ -6,10 +6,10 @@ This application is designed to watch files and directories for changes and copy
    2. Read in paths from console or from a file
 
 # In Progress
-   1. Watch a directory for new files adding anything of a particular type
-   2. Relative pathing
-   3. Link to another file within a file for easier distribution
-   4. Args to pass in, instead of entering in commands directly
+   1. [[#2](https://github.com/ScottGarryFoster/TOOL-WorkingFileWatcher/issues/2)] Watch a directory for new files adding anything of a particular type
+   2. [[#3](https://github.com/ScottGarryFoster/TOOL-WorkingFileWatcher/issues/3)] Relative pathing
+   3. [[#4](https://github.com/ScottGarryFoster/TOOL-WorkingFileWatcher/issues/4)] Link to another file within a file for easier distribution
+   4. [[#5](https://github.com/ScottGarryFoster/TOOL-WorkingFileWatcher/issues/5)] Args to pass in, instead of entering in commands directly
 
 # How to use
 The application is only built for **Windows** and is a console application. Feel free to use the C# code for other applications outside of this.
@@ -37,10 +37,10 @@ To load a path from file at the moment you need to use the command 'from file' t
 ```
 * Files contains all the files to watch. Add as many as you need.
 * Filepath and Destination are direct paths.
-* As of right now, the Destination requires a back slash at the end. (#1)
+* [[#1](https://github.com/ScottGarryFoster/TOOL-WorkingFileWatcher/issues/1)] As of right now, the Destination requires a back slash at the end.
 
 ### Directly
-Upon entering this the next thing to enter is the file then the directory. All directories must end in a back slash.
+Upon entering this the next thing to enter is the file then the directory. [[#1](https://github.com/ScottGarryFoster/TOOL-WorkingFileWatcher/issues/1)] All directories must end in a back slash.
 
 ### Start
 Start will start the watcher.
